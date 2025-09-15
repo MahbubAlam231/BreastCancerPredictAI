@@ -230,7 +230,7 @@ naively want to call a result positive if probability for positive is >= 0.5.
 
 But a serious diagnosis such as breast cancer should have low threshold to avoid
 high number of false negatives.
-We want to be absolutely sure that negative result is truely negative.
+We want to be absolutely sure that a negative result by the model is truely negative.
 Also since the ML algorithms output will be reviewed by professional it is prudent
 to keep the threshold low.
 
