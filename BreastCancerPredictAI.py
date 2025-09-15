@@ -454,7 +454,6 @@ print(f"==={23*'='}[[ Next Steps ]]{23*'='}===\n")
 
 """
 Potential improvements:
-- Hyperparameter tuning with GridSearchCV or RandomizedSearchCV
 - Feature selection to reduce dimensionality
 - Ensemble methods for better generalization
 - Deployment as a simple web app (e.g., with Flask or Streamlit)
