@@ -36,7 +36,7 @@ print(68*"=")
 print(f"==={16*'='}[[ Data loading and cleaning ]]{16*'='}==\n")
 # ==========================================================
 
-"""
+"""# {{{
 We start by loading the cleaned breast cancer dataset.
 Each row represents a tumor with various features extracted from digitized images of a fine needle aspirate (FNA).
 The target column indicates whether the tumor is **malignant (cancerous)** or **benign (non-cancerous)**.
@@ -53,14 +53,26 @@ Steps:
 Looks like there is an extra comma at the end of the columns.
 This creates an empty column called "Unnamed: 32".
 We shall delete it.
-"""
+"""# }}}
 
 df = pd.read_csv('breast_cancer_data.csv')
 
 print(df.head())
 print(df.columns)
+print(f"")
+print(df.info())
 
 df = df.drop(columns="Unnamed: 32")
+print(f"")
+
+# No missing data
+missing_data = df.isna().any()
+print(f"Missing data? - {'Yes' if missing_data.any() else 'No'}")
+
+# Drop perfect duplicate rows
+before = len(df)
+df = df.drop_duplicates()
+print(f"Duplicates removed: {before - len(df)}")
 
 # saving cleaned data
 df.to_csv('breast_cancer_data_cleaned.csv', index=False)
@@ -69,15 +81,6 @@ df.to_csv('breast_cancer_data_cleaned.csv', index=False)
 # Not necessary, just to illustrate
 df = pd.read_csv('breast_cancer_data_cleaned.csv')
 # print(df.columns) # Output: ['id', 'diagnosis', 'radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean', 'compactness_mean', 'concavity_mean', 'concave points_mean', 'symmetry_mean', 'fractal_dimension_mean', 'radius_se', 'texture_se', 'perimeter_se', 'area_se', 'smoothness_se', 'compactness_se', 'concavity_se', 'concave points_se', 'symmetry_se', 'fractal_dimension_se', 'radius_worst', 'texture_worst', 'perimeter_worst', 'area_worst', 'smoothness_worst', 'compactness_worst', 'concavity_worst', 'concave points_worst', 'symmetry_worst', 'fractal_dimension_worst']
-
-# No missing data
-missing_data = df.isna().any()
-print(missing_data.any())
-
-# Drop perfect duplicate rows
-before = len(df)
-df = df.drop_duplicates()
-print(f"Duplicates removed: {before - len(df)}")
 
 # }}}
 
@@ -101,19 +104,11 @@ print(df.info())
 
 print(df['diagnosis'].value_counts())
 
-# Creating binary labels for diagnosis
-def lookup_diagnosis(label):
-    if label == 1:
-        return 'M'
-    else:
-        return 'B'
-
 X = df.drop(columns=["diagnosis", "id"])
 y = (df["diagnosis"] == "M").astype("int")
 
 print(X.info())
 print(y.head())
-
 
 # }}}
 
@@ -132,9 +127,15 @@ Finally we create train test split for machine learning.
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
 X_features = X.columns
-pre = ColumnTransformer([('scaler', StandardScaler(), X_features)])
+
+# Only necessary if 2 or more encoders (I am adding just for demo)
+pre = ColumnTransformer([
+    ('scaler', StandardScaler(),
+     X_features)
+])
 
 # # Just for testing. Has to be commmented before model training,
 # # since this includes X_test in mean_ and scale_
@@ -178,7 +179,6 @@ For this we use GridSearchCV for cross validation.
 To do this reliably let us use a pipeline.
 """
 
-from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
@@ -189,15 +189,15 @@ pipe = Pipeline([
 
 hparams = [
     {
-    'lreg__penalty' : ['l2', 'l1'],
-    'lreg__C' : np.logspace(-3, 3, 13),
-    'lreg__class_weight' : [None, 'balanced']
+        'lreg__penalty' : ['l2', 'l1'],
+        'lreg__C' : np.logspace(-3, 3, 13),
+        'lreg__class_weight' : [None, 'balanced']
     },
     {
-    'lreg__penalty' : ['elasticnet'],
-    'lreg__C' : np.logspace(-3, 3, 13),
-    'lreg__l1_ratio' : np.linspace(0, 1, 5),
-    'lreg__class_weight' : [None, 'balanced']
+        'lreg__penalty' : ['elasticnet'],
+        'lreg__C' : np.logspace(-3, 3, 13),
+        'lreg__l1_ratio' : np.linspace(0, 1, 5),
+        'lreg__class_weight' : [None, 'balanced']
     }
 ]
 
@@ -260,10 +260,10 @@ Of the actually positive points, how many did the model correctly find?
 Here TP + FN are the number of data points that are actually positive.
 """# }}}
 
-probs = best.predict_proba(X_test)[:, 1]
+y_probs = best.predict_proba(X_test)[:, 1]
 
 from sklearn.metrics import precision_recall_curve
-precision, recall, thresholds = precision_recall_curve(y_test, probs)
+precision, recall, thresholds = precision_recall_curve(y_test, y_probs)
 
 plt.plot(thresholds, precision[:-1], label="Precision")
 plt.plot(thresholds, recall[:-1], label="Recall")
@@ -303,12 +303,12 @@ The second method is more robust for medical applications, it collects
 validation signal on the whole training set (each point predicted by a model that didn’t see it).
 """# }}}
 
-def pick_threshold_for_recall(y_true, probs, target_recall=0.99):
+def pick_threshold_for_recall(y_true, y_probs, target_recall=0.99):
     """
     Returns the highest threshold whose recall >= target_recall.
     Using the highest such threshold usually gives better precision.
     """
-    _, recall, thresholds = precision_recall_curve(y_true, probs)
+    _, recall, thresholds = precision_recall_curve(y_true, y_probs)
     # precision/recall have length = len(thresholds)+1; align by dropping the first PR point
     recall_t = recall[:-1]
     thresholds_t = thresholds
@@ -359,6 +359,14 @@ import json
 with open("chosen_threshold.json", "w") as f:
     json.dump({"threshold": float(threshold)}, f)
 
+# # Only when loading saved model and threshold
+# # load best model from file
+# best = joblib.load("best_model.pkl")
+
+# # load back
+# with open("chosen_threshold.json") as f:
+#     threshold = json.load(f)["threshold"]
+
 # }}}
 
 # ================[[ Model Evaluation ]]================={{{
@@ -377,17 +385,6 @@ The ROC curve and AUC score further summarize predictive power.
 
 """
 
-# Only do this when loading saved model and threshold
-import joblib, json
-
-# load best model from file
-best = joblib.load("best_model.pkl")
-
-# load back
-with open("chosen_threshold.json") as f:
-    threshold = json.load(f)["threshold"]
-
-y_probs = best.predict_proba(X_test)[:, 1]
 y_preds = (y_probs >= threshold).astype(int)
 
 from sklearn.metrics import precision_recall_curve
