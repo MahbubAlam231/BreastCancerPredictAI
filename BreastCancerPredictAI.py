@@ -4,16 +4,16 @@
  Author(s)   : Mahbub Alam
  File        : BreastCancerPredictAI.py
  Created     : 2025-05-25
- Description : Breast Cancer Prediction using Machine Learning # {{{
+ Description : Breast Cancer Prediction using Machine Learning: # {{{
 
-This project explores the **Breast Cancer Wisconsin Diagnostic Dataset** to build a machine learning model that can classify tumors as *malignant* or *benign*.
-The goal is to demonstrate end-to-end ML workflow:
+This project uses the **Breast Cancer Wisconsin Diagnostic Dataset** to build a machine learning model that can classify tumors as *malignant* or *benign*.
 
+It demonstrates an end-to-end ML workflow:
     1. Data loading & cleaning
     2. Exploratory data analysis (EDA)
     3. Preprocessing
     4. Model training
-    5. Model evaluation
+    5. Model validation
     6. Insights and conclusions
 
 Such predictive modeling can support early detection and assist healthcare professionals, though models should **never replace medical diagnosis**.
@@ -26,9 +26,6 @@ np.set_printoptions(precision=2)
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import scipy
-import time
-t_0 = time.time()
 
 # ============[[ Data loading and cleaning ]]============{{{
 print(f"")
@@ -57,7 +54,7 @@ We shall delete it.
 
 df = pd.read_csv('breast_cancer_data.csv')
 
-print(df.head())
+# print(df.head())
 print(df.columns)
 print(f"")
 print(df.info())
@@ -98,7 +95,11 @@ We will:
 - Explore correlations between features
 """
 
-print(df.info())
+# ===============[[ Output title like this ]]===============
+print(f"")
+print(68*"=")
+print(f"==={19*'='}[[ Class distribution ]]{19*'='}===\n")
+# ==========================================================
 
 # Proportion of benign and malignant tumors
 
@@ -107,8 +108,72 @@ print(df['diagnosis'].value_counts())
 X = df.drop(columns=["diagnosis", "id"])
 y = (df["diagnosis"] == "M").astype("int")
 
-print(X.info())
-print(y.head())
+# ===============[[ Output title like this ]]===============
+print(f"")
+print(68*"=")
+print(f"==={22*'='}[[ Visualization ]]{22*'='}==\n")
+# ==========================================================
+
+"""# {{{
+
+Radius, texture and perimeter -- mean, standard error and worst value.
+
+"""# }}}
+
+df_benign = df[df["diagnosis"] == "B"]
+df_malignant = df[df["diagnosis"] == "M"]
+
+features = X.columns
+
+n_cols = 3
+n_rows = 3
+size = n_rows * n_cols
+
+fig_name = "Feature Distributions by Diagnosis"
+plt.figure(num=fig_name, figsize=(n_rows * 3.5, n_cols * 3.5))
+
+for i in range(size):
+    plt.subplot(n_rows, n_cols, i+1)
+    feature = features[i//3 + 10 * (i%3)]
+    sns.kdeplot(df_benign[feature], color="blue", label="B", fill=False)
+    sns.kdeplot(df_malignant[feature], color="magenta", label="M", fill=False)
+    plt.legend(loc="upper right", fontsize=8)
+
+plt.suptitle(fig_name, fontsize=14)
+plt.tight_layout(pad=2.5, rect=(0, 0.05, 1, 0.95))
+plt.subplots_adjust(hspace=0.4, wspace=0.25)
+
+plt.savefig('feature_distribution_eda.jpg')
+plt.show()
+
+# ===============[[ Output title like this ]]===============
+print(f"")
+print(68*"=")
+print(f"==={14*'='}[[ Correlation between features ]]{14*'='}===\n")
+# ==========================================================
+
+cols = list(X.columns[:6]) + ["diagnosis"]
+
+fig_name = "Scatter plot of features"
+g = sns.pairplot(df[cols],
+                 hue="diagnosis",
+                 corner=True,
+                 plot_kws={'alpha': 0.6, 's': 10, 'edgecolor': 'none'},
+                 diag_kind="kde",
+                 palette={'B': 'blue', 'M': 'magenta'},
+                )
+
+g.fig.set_size_inches(9, 9)
+plt.setp(g._legend.get_texts(), fontsize=15)
+g._legend.get_title().set_fontsize(15)
+g._legend.set_bbox_to_anchor((0.8, 0.7))
+g.fig.canvas.manager.set_window_title(fig_name)
+g.fig.suptitle(fig_name, fontsize=14, y=0.90)
+g.fig.tight_layout(pad=2.5, rect=(0, 0.05, 1, 0.95))
+g.fig.subplots_adjust(hspace=0.4, wspace=0.25)
+
+g.fig.savefig('correlation_between_features.jpg')
+plt.show()
 
 # }}}
 
@@ -133,8 +198,7 @@ X_features = X.columns
 
 # Only necessary if 2 or more encoders (I am adding just for demo)
 pre = ColumnTransformer([
-    ('scaler', StandardScaler(),
-     X_features)
+    ('scaler', StandardScaler(), X_features)
 ])
 
 # # Just for testing. Has to be commmented before model training,
@@ -154,8 +218,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, strat
 # }}}
 
 # =================[[ Model Training ]]=================={{{
+print(f"")
+print(68*"=")
+print(f"==={21*'='}[[ Model Training ]]{21*'='}===\n")
+# ==========================================================
 
 """
+
 We will train multiple classifiers (e.g., Logistic Regression,
 K Nearest Neighbors, etc.) and Neural Networks and compare their
 performance to find the most effective model.
@@ -165,6 +234,7 @@ Evaluation metrics include:
 - Recall
 - F1-score
 - ROC-AUC
+
 """
 
 # ===============[[ Output title like this ]]===============
@@ -212,9 +282,9 @@ grid = GridSearchCV(
 )
 
 grid.fit(X_train, y_train)
-best = grid.best_estimator_
+best_model = grid.best_estimator_
 
-best.fit(X_train, y_train)
+best_model.fit(X_train, y_train)
 
 # ===============[[ Output title like this ]]===============
 print(f"")
@@ -223,7 +293,7 @@ print(f"==={8*'='}[[ Deciding a threshold for positive results ]]{8*'='}==\n")
 # ==========================================================
 
 """# {{{
-Given the model (best) will give us probabilities for malignant tumor (between 0 and 1).
+Given the model (best_model) will give us probabilities for malignant tumor (between 0 and 1).
 It might seem
 natural to choose 0.5 as a threshold for positive result, i.e., we might
 naively want to call a result positive if probability for positive is >= 0.5.
@@ -260,7 +330,7 @@ Of the actually positive points, how many did the model correctly find?
 Here TP + FN are the number of data points that are actually positive.
 """# }}}
 
-y_probs = best.predict_proba(X_test)[:, 1]
+y_probs = best_model.predict_proba(X_test)[:, 1]
 
 from sklearn.metrics import precision_recall_curve
 precision, recall, thresholds = precision_recall_curve(y_test, y_probs)
@@ -289,7 +359,7 @@ This might lead to **overfitting** to the test set.
 
 Let's use cross validation (CV) again for doing this.
 More precisely, CV splits the train data (X_train) into CV_train, CV_validation (with different random state than before).
-We train out best model on CV_train. On CV_validation the model gives probabilities for positive results.
+We train our best_model on CV_train. On CV_validation the model gives probabilities for positive results.
 
 Now, there are two ways to proceed:
     1. We compare this CV_validation probabilities to relevant y_train to find
@@ -329,8 +399,8 @@ cv_thresh = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)  # NEW s
 oof_probs = np.empty(len(y_train), dtype=float) # Out of fold probs
 
 for tr, va in cv_thresh.split(X_train, y_train):
-    # start the best model with initial state
-    est = clone(best)
+    # start the best_model with initial state
+    est = clone(best_model)
     est.fit(X_train.iloc[tr], y_train.iloc[tr])
     oof_probs[va] = est.predict_proba(X_train.iloc[va])[:, 1]
 
@@ -350,18 +420,18 @@ At this point we can save the model and the threshold for future use.
 import joblib
 
 # final refit on full train, then apply fixed threshold on test
-best.fit(X_train, y_train)
+best_model.fit(X_train, y_train)
 
 # save to file
-joblib.dump(best, "best_model.pkl")
+joblib.dump(best_model, "best_model.pkl")
 
 import json
 with open("chosen_threshold.json", "w") as f:
     json.dump({"threshold": float(threshold)}, f)
 
 # # Only when loading saved model and threshold
-# # load best model from file
-# best = joblib.load("best_model.pkl")
+# # load best_model from file
+# best_model = joblib.load("best_model.pkl")
 
 # # load back
 # with open("chosen_threshold.json") as f:
@@ -392,6 +462,10 @@ precision, recall, thresholds = precision_recall_curve(y_test, y_probs)
 
 plt.plot(thresholds, precision[:-1], label="Precision")
 plt.plot(thresholds, recall[:-1], label="Recall")
+plt.axvline(x=threshold, color="red", linestyle="--", linewidth=1.5,
+            label=f"Chosen threshold = {threshold:.3f}")
+plt.text(threshold*1.2, 0.5, f"{threshold:.3f}", rotation=90,
+         va='center', ha='right', color='red', fontsize=9)
 plt.xlabel("Threshold")
 plt.ylabel("Score")
 plt.title("Precision and recall vs threshold")
@@ -416,7 +490,15 @@ def metrics_at_threshold(y_true, y_preds, threshold):
 
 report = metrics_at_threshold(y_test, y_preds, threshold)
 
-print(report)
+# results
+print("\nModel report:")
+for metric, value in report.items():
+    if metric == "confusion_matrix":
+        print(f"    {metric:20} :")
+        print(f"{value}")
+    else:
+        print(f"    {metric:20} : {value:.4f}")
+
 
 # Output:
 # {'threshold': 0.18020206682554823, 'precision': 0.9111111111111111, 'recall': 0.9761904761904762, 'accuracy': 0.956140350877193,
@@ -434,7 +516,7 @@ print(f"==={23*'='}[[ Conclusion ]]{23*'='}===\n")
 """
 
 - The models show strong ability to distinguish between malignant and benign tumors.
-- best achieved the highest performance, with 95.6% accuracy and 97.6% recall.
+- best_model achieved the highest performance, with 95.6% accuracy and 97.6% recall.
 - This demonstrates the potential of ML in assisting medical diagnostics.
 
 Note: This project is for educational and demonstration purposes only.
@@ -460,5 +542,3 @@ This would make the project even more practical and showcase end-to-end ML engin
 
 
 # }}}
-
-print(f"\nProgram ran for {time.time() - t_0:.3f} secs.\n")
