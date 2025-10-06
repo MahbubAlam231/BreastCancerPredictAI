@@ -41,14 +41,6 @@ The pipeline follows these steps:
 
 ---
 
-## Results
-
-- Achieved **95.6% accuracy** and **97.6% recall** on the test set
-- High recall ensures the model rarely misses malignant cases
-- Shows potential of ML for assisting medical diagnostics (but not replacing doctors)
-
----
-
 ## Jupyter Notebook
 
 For a full walkthrough with code, outputs, and visualizations, see the
