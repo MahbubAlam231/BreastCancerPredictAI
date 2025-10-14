@@ -9,6 +9,7 @@
 This project uses the **Breast Cancer Wisconsin Diagnostic Dataset** to build a machine learning model that can classify tumors as *malignant* or *benign*.
 
 It demonstrates an end-to-end ML workflow:
+
     1. Data loading & cleaning
     2. Exploratory data analysis (EDA)
     3. Preprocessing
@@ -90,6 +91,7 @@ print(f"==={19*'='}[[ Exploratory data analysis (EDA) ]]{19*'='}===\n")
 """
 Understanding the dataset is key before building models.
 We will:
+
 - Check class distribution (malignant vs. benign)
 - Visualize feature distributions
 - Explore correlations between features
@@ -228,7 +230,9 @@ print(f"==={21*'='}[[ Model Training ]]{21*'='}===\n")
 We will train multiple classifiers (e.g., Logistic Regression,
 K Nearest Neighbors, etc.) and Neural Networks and compare their
 performance to find the most effective model.
+
 Evaluation metrics include:
+
 - Accuracy
 - Precision
 - Recall
@@ -448,6 +452,7 @@ print(f"==={20*'='}[[ Model Evaluation ]]{20*'='}===\n")
 """
 We compare model performance on the test set.
 Metrics and confusion matrices help us assess:
+
 - How well the model detects malignant tumors (sensitivity/recall)
 - How well it avoids false positives (specificity/precision)
 
@@ -533,6 +538,7 @@ print(f"==={23*'='}[[ Next Steps ]]{23*'='}===\n")
 
 """
 Potential improvements:
+
 - Feature selection to reduce dimensionality
 - Ensemble methods for better generalization
 - Deployment as a simple web app (e.g., with Flask or Streamlit)
