@@ -8,6 +8,16 @@ It must **not** be used for clinical decision-making.
 
 ---
 
+## Jupyter Notebook
+
+For a full walkthrough with code, outputs, and visualizations, see the
+Jupyter Notebook [BreastCancerPredictAI.ipynb](BreastCancerPredictAI.ipynb)
+
+Run the notebook online (no setup required):
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MahbubAlam231/BreastCancerPredictAI/main?filepath=BreastCancerPredictAI.ipynb)
+
+---
+
 ## Project Workflow
 
 The pipeline follows these steps:
@@ -38,14 +48,3 @@ The pipeline follows these steps:
 7. **Saving Model & Threshold**
    - Best model saved with `joblib`
    - Optimal threshold stored in JSON for reproducibility
-
----
-
-## Jupyter Notebook
-
-For a full walkthrough with code, outputs, and visualizations, see the
-Jupyter Notebook [BreastCancerPredictAI.ipynb](BreastCancerPredictAI.ipynb)
-
-You can also run the notebook here:
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MahbubAlam231/BreastCancerPredictAI/main?filepath=BreastCancerPredictAI.ipynb)
-https://mybinder.org/v2/gh/MahbubAlam231/BreastCancerPredictAI/main?filepath=BreastCancerPredictAI.ipynb
