@@ -45,3 +45,7 @@ The pipeline follows these steps:
 
 For a full walkthrough with code, outputs, and visualizations, see the
 Jupyter Notebook [BreastCancerPredictAI.ipynb](BreastCancerPredictAI.ipynb)
+
+You can also run the notebook here:
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MahbubAlam231/BreastCancerPredictAI/main?filepath=BreastCancerPredictAI.ipynb)
+https://mybinder.org/v2/gh/MahbubAlam231/BreastCancerPredictAI/main?filepath=BreastCancerPredictAI.ipynb
